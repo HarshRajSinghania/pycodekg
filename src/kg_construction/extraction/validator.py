@@ -19,6 +19,7 @@ from kg_construction.validation.base import ValidationBase
 
 
 class TestContextValidator(ValidationBase):
+    __test__ = False
     """Validate TestContext subgraphs for LLM test generation."""
 
     def __init__(self, context: TestContext):

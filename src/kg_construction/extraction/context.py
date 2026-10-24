@@ -45,6 +45,7 @@ from kg_construction.extraction.patch import (
 
 @dataclass
 class TestContext:
+    __test__ = False
     """Structured subgraph extracted for test generation.
 
     Attributes:
@@ -125,6 +126,7 @@ class TestContext:
             'edge_count': self.edge_count,
             'cross_file_node_proportion': self.cross_file_node_proportion,
             'relationship_type_counts': self.relationship_type_counts,
+            'stale_seed_labels': self.stale_seed_labels,
         }
         Path(path).write_text(json.dumps(data, indent=2))
         print(f"✓ Saved subgraph to {path}")
@@ -153,6 +155,7 @@ class TestContext:
             edge_count=data.get('edge_count'),
             cross_file_node_proportion=data.get('cross_file_node_proportion'),
             relationship_type_counts=data.get('relationship_type_counts'),
+            stale_seed_labels=data.get('stale_seed_labels', []),
         )
 
     def summary(self) -> str:
@@ -190,6 +193,7 @@ class TestContext:
 
 
 class TestContextExtractor:
+    __test__ = False
     """Extract KG subgraphs from dataset instances for test generation."""
 
     def __init__(self, engine: KGQueryEngine, repo_manager: Optional[RepoManager] = None):
@@ -629,7 +633,7 @@ class TestContextExtractor:
                 })
                 for child in ast.iter_child_nodes(node):
                     if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                        func_id = _make_id(f"func_{repo}_{rel_path}_{node.name}_{child.name}")
+                        func_id = _make_id(f"func_{repo}_{rel_path}_{node.name}.{child.name}")
                         func_metadata = _build_func_metadata(
                             child, rel_path, repo, parent_class=node.name,
                             import_map=import_map, source_lines=source_lines,

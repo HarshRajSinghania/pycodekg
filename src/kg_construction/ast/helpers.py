@@ -43,14 +43,19 @@ def _make_id(text: str) -> str:
 
 
 def _is_test_file(filepath: str) -> bool:
-    """Return True if the file path matches common Python test file conventions."""
+    """Return True if the file path matches common Python test file conventions.
+
+    Matches files named test_*.py or *_test.py, or any file under a directory
+    literally named 'tests'. Does not treat a bare 'test' path component as
+    indicating a test file (framework packages such as django/test/ are not
+    test files of the project under analysis).
+    """
     parts = Path(filepath).parts
     name = Path(filepath).name
     return (
         name.startswith('test_') or
         name.endswith('_test.py') or
-        'tests' in parts or
-        'test' in parts
+        'tests' in parts
     )
 
 

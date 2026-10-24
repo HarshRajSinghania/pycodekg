@@ -134,7 +134,7 @@ class KGNode:
     """A node in the knowledge graph representing a code entity.
 
     Attributes:
-        id: Deterministic 8-char MD5 hash of the entity's qualified name.
+        id: Deterministic 16-char MD5 hash of the entity's qualified name.
             Identical entities across issues/commits map to the same ID.
         type: One of 'file', 'test_file', 'class', 'function', 'method',
               'test_function', 'import'.
@@ -1853,7 +1853,10 @@ class RepoKGBuilder:
             return None
         with open(kg_file) as f:
             kg = json.load(f)
-        if kg.get('metadata', {}).get('base_commit') != commit:
+        cached_commit = kg.get('metadata', {}).get('base_commit') or ''
+        # Accept either full or short SHA: cache filename uses first 8 chars,
+        # but the stamped base_commit is the full SHA.
+        if not (cached_commit == commit or cached_commit.startswith(commit) or commit.startswith(cached_commit)):
             return None
         if kg.get('metadata', {}).get('schema_version') != SCHEMA_VERSION:
             return None
